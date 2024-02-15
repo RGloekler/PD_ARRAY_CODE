@@ -6,6 +6,7 @@ from matplotlib import pyplot as plt
 from matplotlib.pyplot import draw
 import numpy as np
 import serial, re, sys, csv, os
+import time
 
 # grab current data from the serial bus
 def grab_serial(ser):
@@ -21,6 +22,12 @@ def scale_values(data_array):
         try: data_array[val] /= 1023
         except: print("Couldn't convert... Trying again")
     return data_array
+
+# create a new array that can be plotted (expected data format)
+def make_plottable(input_data):
+    plottable_data = []
+    for val in range(0,2): plottable_data.append(input_data)
+    return plottable_data
 
 # creates a new csv file that background data can be written to
 def create_csv(filenm):
@@ -38,17 +45,20 @@ def create_csv(filenm):
 def main():
     # search for csv, create one if it is not found
     filenm = 'data_test.csv'
-    if filenm not in os.listdir('.'):
+    if filenm not in os.listdir('./'):
         file_writer = create_csv(filenm) # create a csv to store image data
     else: file_writer = csv.writer(open(filenm, 'a', encoding = 'UTF8', newline=''))
 
     ser = serial.Serial(port='COM4', baudrate=115200, timeout = 1) # set up serial communication
     non_decimal = re.compile(r'[^\d,]+') # setup regex for data parsing
 
+    # set sample counter to 0
+    counter = 0
     while True:
         line = grab_serial(ser).split(', ') # constantly poll serial until new data is recieved
 
         if len(line) > 2: # get only proper pixel data from serial
+            counter += 1
             processed = [] # create processing array
             # convert all values to integers, omit all other characters
             for val in range(len(line)):
@@ -60,12 +70,31 @@ def main():
 
             # scale values to range of 0-1, omitting the sample number row
             scaled = scale_values(processed[0:-1])
+            scaled_converted = [float(val) for val in scaled]
+            plottable = make_plottable(scaled_converted)
+
             scaled.append(processed[-1])
             scaled.append(str(datetime.now()))
             print(scaled)
 
             # write the current set of pixel data to csv, and close file
             file_writer.writerow(scaled)
+
+            if counter % 100 == 0:
+                # Set the figure size, and scale
+                plt.rcParams["figure.figsize"] = [7, 3.50]
+                plt.rcParams["figure.autolayout"] = True
+
+
+                print('\nPlotting light-intensity map')
+
+                # set up the figure for plotting pixels
+                fig, ax = plt.subplots(1,1)
+                image = plottable
+                im = ax.imshow(image, cmap='Reds', vmin = 0, vmax= 1)
+                ax.set_title('PD Array Output')
+                ax.set_xlabel('Pixel Number')
+                plt.show() # plot the last sample recieved
 
 if __name__ == '__main__':
     main()

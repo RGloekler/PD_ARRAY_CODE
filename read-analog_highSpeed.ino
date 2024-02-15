@@ -4,6 +4,7 @@
 // https://www.arduino.cc/reference/en/language/functions/external-interrupts/attachinterrupt/
 
 // Ryan Gloekler, UC Davis. Hunt Vacuum Microectronics Lab
+// regloekler@ucdavis.edu
 // Takes an input trigger from DG535, which causes an interrupt. 100 data samples are taken at 10KHz
 // (10 ms total sampling time). Data is then sent to serial, where it can be retrieved by python for processing.
 // Last edit: 2/15/2024
