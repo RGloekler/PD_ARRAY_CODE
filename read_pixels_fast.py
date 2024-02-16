@@ -46,20 +46,26 @@ def main():
     # search for csv, create one if it is not found
     filenm = 'data_test.csv'
     if filenm not in os.listdir('./'):
-        file_writer = create_csv(filenm) # create a csv to store image data
-    else: file_writer = csv.writer(open(filenm, 'a', encoding = 'UTF8', newline=''))
+        file_writer = create_csv(filenm)
+    else:
+        file_writer = csv.writer(open(filenm, 'a', encoding = 'UTF8', newline=''))
 
-    ser = serial.Serial(port='COM4', baudrate=115200, timeout = 1) # set up serial communication
-    non_decimal = re.compile(r'[^\d,]+') # setup regex for data parsing
+    # set up serial communication
+    ser = serial.Serial(port='COM4', baudrate=115200, timeout = 1)
+    # setup regex for data parsing
+    non_decimal = re.compile(r'[^\d,]+')
 
     # set sample counter to 0
     counter = 0
+
+    # main loop of operation - constanty scan serial, until we recieve data from ADC (firmware has been triggered)
     while True:
-        line = grab_serial(ser).split(', ') # constantly poll serial until new data is recieved
+        line = grab_serial(ser).split(', ')
 
         if len(line) > 2: # get only proper pixel data from serial
             counter += 1
             processed = [] # create processing array
+
             # convert all values to integers, omit all other characters
             for val in range(len(line)):
                 converted = non_decimal.sub('', line[val])
@@ -70,9 +76,12 @@ def main():
 
             # scale values to range of 0-1, omitting the sample number row
             scaled = scale_values(processed[0:-1])
+
+            # convert data to floating point and get a plottable version for later
             scaled_converted = [float(val) for val in scaled]
             plottable = make_plottable(scaled_converted)
 
+            # add metadata to the data, for final excel readability
             scaled.append(processed[-1])
             scaled.append(str(datetime.now()))
             print(scaled)
@@ -80,13 +89,13 @@ def main():
             # write the current set of pixel data to csv, and close file
             file_writer.writerow(scaled)
 
+            # if recieved a complete set of data, plot it
             if counter % 100 == 0:
                 # Set the figure size, and scale
                 plt.rcParams["figure.figsize"] = [7, 3.50]
                 plt.rcParams["figure.autolayout"] = True
 
-
-                print('\nPlotting light-intensity map')
+                print('\nPlotting light-intensity map...')
 
                 # set up the figure for plotting pixels
                 fig, ax = plt.subplots(1,1)
