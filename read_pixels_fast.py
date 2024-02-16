@@ -1,12 +1,14 @@
 # @author Ryan Gloekler, UC Davis. Hunt Vacuum Microectronics Lab
 # regloekler@ucdavis.edu
+# Last updated: 2/16/2024
 
 from datetime import *
 from matplotlib import pyplot as plt
 from matplotlib.pyplot import draw
-import numpy as np
 import serial, re, sys, csv, os
 import time
+
+#------------------------ DEFINE HELPER FUNCTIONS ------------------------------
 
 # grab current data from the serial bus
 def grab_serial(ser):
@@ -19,7 +21,7 @@ def grab_serial(ser):
 def scale_values(data_array):
     # normalize
     for val in range(len(data_array)):
-        try: data_array[val] /= 1023
+        try: data_array[val] /= 1023 # arduino uses a 10-bit ADC, 1024 values
         except: print("Couldn't convert... Trying again")
     return data_array
 
@@ -40,6 +42,8 @@ def create_csv(filenm):
     writer.writerow(header)
     return writer
 
+
+#----------------------- IMPLEMENT MAIN FUNCTIONALITY --------------------------
 # since the heavy lifting is done in firmware, we just need to read all the
 # data from serial here...
 def main():
@@ -58,7 +62,8 @@ def main():
     # set sample counter to 0
     counter = 0
 
-    # main loop of operation - constanty scan serial, until we recieve data from ADC (firmware has been triggered)
+    # main loop of operation - constanty scan serial,
+    # until we recieve data from ADC (firmware has been triggered)
     while True:
         line = grab_serial(ser).split(', ')
 
