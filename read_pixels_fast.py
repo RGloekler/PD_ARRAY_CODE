@@ -42,7 +42,6 @@ def create_csv(filenm):
     writer.writerow(header)
     return writer
 
-
 #----------------------- IMPLEMENT MAIN FUNCTIONALITY --------------------------
 # since the heavy lifting is done in firmware, we just need to read all the
 # data from serial here...
