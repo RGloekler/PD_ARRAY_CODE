@@ -7,6 +7,7 @@ from matplotlib import pyplot as plt
 from matplotlib.pyplot import draw
 import serial, re, sys, csv, os
 import time
+import numpy as np
 
 #------------------------ DEFINE HELPER FUNCTIONS ------------------------------
 
@@ -47,7 +48,7 @@ def create_csv(filenm):
 # data from serial here...
 def main():
     # search for csv, create one if it is not found
-    filenm = 'data_test.csv'
+    filenm = 'data_collection_dump.csv'
     if filenm not in os.listdir('./'):
         file_writer = create_csv(filenm)
     else:
@@ -63,9 +64,10 @@ def main():
 
     # main loop of operation - constanty scan serial,
     # until we recieve data from ADC (firmware has been triggered)
+    averaged = []
+    averaged_np = []
     while True:
         line = grab_serial(ser).split(', ')
-
         if len(line) > 2: # get only proper pixel data from serial
             counter += 1
             processed = [] # create processing array
@@ -83,6 +85,7 @@ def main():
 
             # convert data to floating point and get a plottable version for later
             scaled_converted = [float(val) for val in scaled]
+            averaged.append(scaled_converted)
             plottable = make_plottable(scaled_converted)
 
             # add metadata to the data, for final excel readability
@@ -95,6 +98,19 @@ def main():
 
             # if recieved a complete set of data, plot it
             if counter % 100 == 0:
+                # if we are ready to finish handling this shot, average data
+                # for plotting
+
+                # print(averaged)
+
+                # create a numpy array object to handle averaging
+                # uncomment this block to enable averaging over the total 10ms
+                # period
+                print('\nPLOTTING DATA AVERAGED OVER 10ms')
+                np_array = np.array(averaged)
+                averaged_np = np.mean(np_array, axis=0)
+                plottable = make_plottable(averaged_np)
+
                 # Set the figure size, and scale
                 plt.rcParams["figure.figsize"] = [7, 3.50]
                 plt.rcParams["figure.autolayout"] = True
@@ -108,6 +124,7 @@ def main():
                 ax.set_title('PD Array Output')
                 ax.set_xlabel('Pixel Number')
                 plt.show() # plot the last sample recieved
+                averaged = [] # reset the averaging list for the next shot
 
 if __name__ == '__main__':
     main()

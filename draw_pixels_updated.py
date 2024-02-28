@@ -1,6 +1,6 @@
 # Ryan Gloekler, Hunt Vacuum Microelectronics Lab, MGXI Project
 # @author: regloekler@ucdavis.edu
-# last updated 11/2/2023
+# last updated 11/3/2023
 
 # Operation: Run draw_pixels_updated.py from the terminal. This will create a data
 # file containing background signal, for the first 150 samples. The program will then
@@ -9,6 +9,11 @@
 # real time. The values displayed have the average of the background data subtacted from
 # them, so as to ensure that as much noise can be cut from the sensor readings as possible.
 
+# This file has been replaced.. Use this one for live monitoring of the PD_array,
+# rather than data collection. Data collection should be handled with read_pixels_fast.py
+
+# NOTE: For this code to work, simple firmware writing the data to serial is needed. This code is
+# now deprecated.
 
 from datetime import *
 from matplotlib import pyplot as plt
@@ -75,6 +80,8 @@ def collect_csv_data():
 # main loop: creates figure, sets up serial communication, gets data from serial,
 # performs background subtraction, and live plots the PD array data
 def main():
+    averaged_time = []
+    timer_counter = 0
     # establish comms with the arduino
     ser = serial.Serial(port='COM4', baudrate=9600, timeout = 1)
 
@@ -131,12 +138,16 @@ def main():
         # plotted
         scaled = scale_values(new_data)
         plottable = [[]]
-        for val in range(len(scaled)):
-            try:
-                scaled[val] = float(scaled[val]) - float(averaged[val]) # perform the background subtraction, and plot
-            except:
-                print("Couldn't update.. Trying again")
 
+        """ SKIPPING BG SUBTRACTION FOR NOW
+        if bg_data in os.listdir('./'): # dont bg sub if there is no bg
+            for val in range(len(scaled)):
+                try:
+                    scaled[val] = float(scaled[val]) - float(averaged[val]) # perform the background subtraction, and plot
+                except:
+                    print("Couldn't update.. Trying again")
+        """
+        print(scaled)
         plottable = make_plottable(scaled)
         try: # update the canvas...
             image = plottable
@@ -144,7 +155,8 @@ def main():
             fig.canvas.draw_idle()
             plt.pause(0.00001)
         except:
-            print('Couldnt updata canvas... Data error.')
+            print('Couldnt update canvas... Data error.')
+
 
         # write the scaled data to the appropriate spreadsheet
         if writer: writer.writerow(scaled)
@@ -157,7 +169,10 @@ def main():
         if background_counter >= 150: exit('Finished Collecting Background data.')
         final_time = time.perf_counter()
 
-        print(final_time - initial_time)
+        timer_counter += 1
+        averaged_time.append(final_time - initial_time)
+        if timer_counter % 200 == 0:
+            print(np.mean(averaged_time))
     file.close()
 
 if __name__ == '__main__':
