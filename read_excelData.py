@@ -25,28 +25,35 @@ def time_to_row(sample_time):
     return sample_num, sample_rounded
 
 def plot_sample(data, time_val):
-    print('\nPlotting data closest to ' + str(time_val) + 'ms.')
-
     # Set the figure size, and scale
     plt.rcParams["figure.figsize"] = [7, 3.50]
     plt.rcParams["figure.autolayout"] = True
 
+    print('\nPlotting data closest to ' + str(time_val) + 'ms.')
+
     # set up the figure for plotting pixels
     fig, ax = plt.subplots(1,1)
-    image = data
-    im = ax.imshow(image, cmap='Reds', vmin = 0, vmax= 1)
     ax.set_title('PD Array Output')
     ax.set_xlabel('Pixel Number')
+
+    image = data
+    im = ax.imshow(image, cmap='Reds', vmin = 0, vmax= 1)
     plt.show() # plot the last sample recieved
     return
 
 
 def main():
+    global ANIMATE
+    ANIMATE = False
     if len(sys.argv) < 2:
         exit("Provide excel file name and desired time")
     else:
         filenm, time = sys.argv[1], float(sys.argv[2])
         excel_data = []
+
+    if len(sys.argv) > 3:
+        ANIMATE = True
+        print('Animating data over 10ms.')
 
     print("Displaying data from the data point closest to " + str(time) + "ms")
     sample_value = time_to_row(time)[1]
@@ -61,11 +68,36 @@ def main():
 
     # remove header from excel data
     excel_data.pop(0)
-    datapoint = excel_data[sample_value][:-2]
-    scaled_converted = [float(val) for val in datapoint]
-    plottable = make_plottable(scaled_converted)
+    if ANIMATE:
+        # set up the figure for plotting pixels
+        # Set the figure size, and scale
+        plt.rcParams["figure.figsize"] = [7, 3.50]
+        plt.rcParams["figure.autolayout"] = True
 
-    plot_sample(plottable, time)
+        fig, ax = plt.subplots(1,1)
+        image = make_plottable([1] * 15)
+        im = ax.imshow(image, cmap='Reds', vmin = 0, vmax= 1)
+        ax.set_title('PD Array Output')
+        ax.set_xlabel('Pixel Number')
+
+        for i in range(len(excel_data) - 1):
+            datapoint = excel_data[i][:-2]
+            scaled_converted = [float(val) for val in datapoint]
+            plottable = make_plottable(scaled_converted)
+
+            image = plottable
+            im.set_data(image)
+            fig.canvas.draw_idle()
+            plt.pause(0.1) # pause for 100ms before drawing next frame
+            # this means that 100 samples * .1 s = 10s
+            # therefore, we are animating 10ms of data over 10s
+
+    else:
+        datapoint = excel_data[sample_value][:-2]
+        scaled_converted = [float(val) for val in datapoint]
+        plottable = make_plottable(scaled_converted)
+
+        plot_sample(plottable, time)
     return
 
 if __name__ == "__main__":
