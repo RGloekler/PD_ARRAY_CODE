@@ -1,12 +1,16 @@
-// the setup routine runs once when you press reset:
+// Ryan Gloekler, UC Davis. Hunt Vacuum Microectronics Lab
+// regloekler@ucdavis.edu
+// Simply collects data from the arduino Analog-Digital Converter pins A0-A15
+// Sends collected data to serial bus, such that Python can read and process sensor data
+// Last edit: 2/29/2024
+
 void setup() {
   // initialize serial communication at 9600 bits per second:
   Serial.begin(9600);
 }
 
-// the loop routine runs over and over again forever:
 void loop() {
-  // read the input on analog pin 0:
+  // read the input on analog pins:
   int sensorValue = analogRead(A0);
   int sensorValue1 = analogRead(A1);
   int sensorValue2 = analogRead(A2);
@@ -25,7 +29,7 @@ void loop() {
   int sensorValue15 = analogRead(A15);
   
   
-  // print out the value you read:  
+  // send the ADC values to serial for Python collection  
   Serial.print(String(sensorValue) + ',');
   Serial.print(String(sensorValue1) + ',');
   Serial.print(String(sensorValue2) + ',');
@@ -42,6 +46,6 @@ void loop() {
   Serial.print(String(sensorValue13) + ',');
   Serial.print(String(sensorValue14) + ',');
   Serial.println(String(sensorValue15));
-  delay(175);
+  delay(175); // 175 ms between sensor readings (preserve serial data integrity for live plotting)
 
 }
