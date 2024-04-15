@@ -2,19 +2,21 @@
 # @author: regloekler@ucdavis.edu
 # last updated 11/3/2023
 
+# Operation: Run the program, with an argument of the csv file name you would like
+# to play back. Timing is set for my individual PC, but can easily be determined by
+# setting draw delay to the average read/draw time from the collection script.
+
 from datetime import *
 from matplotlib import pyplot as plt
 from matplotlib.pyplot import draw
 import numpy as np
 import serial, re, sys, csv, os
 
-
 # create a new array that can be plotted (expected data format)
 def make_plottable(input_data):
     plottable_data = []
     for val in range(0,2): plottable_data.append(input_data)
     return plottable_data
-
 
 # open the passed csv file, and play back its contents
 def main():
@@ -50,8 +52,8 @@ def main():
     # set up the figure for plotting pixels
     fig, ax = plt.subplots(1,1)
     image = make_plottable(placeholder)
-    im = ax.imshow(image, cmap='Reds', vmin = 0, vmax= 1)
-    ax.set_title('PD Array Output')
+    im = ax.imshow(image, cmap='Blues', vmin = 0, vmax= 1)
+    ax.set_title('PD Array Output - Playback of ' + filenm)
     ax.set_xlabel('Pixel Number')
 
     for val in converted:
@@ -60,11 +62,13 @@ def main():
             image = plottable
             im.set_data(image)
             fig.canvas.draw_idle()
-            plt.pause(0.11) # wait 0.11 seconds before updating. Simulates average COM read time
+            plt.pause(0.094) # wait 0.094 seconds before updating. Simulates average COM read time, averaged from data collection 
         except:
             print('Couldnt updata canvas... Data error.')
 
     print('Playback complete.')
     file.close()
+
+
 if __name__ == "__main__":
     main()

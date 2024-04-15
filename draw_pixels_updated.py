@@ -1,6 +1,6 @@
 # Ryan Gloekler, Hunt Vacuum Microelectronics Lab, MGXI Project
 # @author: regloekler@ucdavis.edu
-# last updated 11/3/2023
+# last updated 2/29/2024
 
 # Operation: Run draw_pixels_updated.py from the terminal. This will create a data
 # file containing background signal, for the first 150 samples. The program will then
@@ -9,7 +9,7 @@
 # real time. The values displayed have the average of the background data subtacted from
 # them, so as to ensure that as much noise can be cut from the sensor readings as possible.
 
-# This file has been replaced.. Use this one for live monitoring of the PD_array,
+# This file has been replaced..  should be used for live monitoring of the PD_array,
 # rather than data collection. Data collection should be handled with read_pixels_fast.py
 
 # NOTE: For this code to work, simple firmware writing the data to serial is needed. This code is
@@ -139,7 +139,7 @@ def main():
         scaled = scale_values(new_data)
         plottable = [[]]
 
-        """ SKIPPING BG SUBTRACTION FOR NOW
+        """ SKIPPING BG SUBTRACTION; negligible dark current, not needed for live updating purposes.
         if bg_data in os.listdir('./'): # dont bg sub if there is no bg
             for val in range(len(scaled)):
                 try:

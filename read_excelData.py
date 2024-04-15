@@ -5,6 +5,11 @@
 # NOTE: this program expects that the data being processed (csv file) contains
 # only one shot, seperate shots of interest into seperate csv files.
 
+# Operation: Run the script as: py read_excelData.py 'datafile.csv' x [animate]
+# where x is the time values you would like to visualize, and animate is an optional
+# parameter, allowing for a playback animation of all 100 datapoints over 10 seconds
+# (10ms data collection period)
+
 import os, sys, csv
 import numpy as np
 from matplotlib import pyplot as plt
@@ -33,7 +38,7 @@ def plot_sample(data, time_val):
 
     # set up the figure for plotting pixels
     fig, ax = plt.subplots(1,1)
-    ax.set_title('PD Array Output')
+    ax.set_title('PD Array Output at ' + str(time_val) + 'ms')
     ax.set_xlabel('Pixel Number')
 
     image = data

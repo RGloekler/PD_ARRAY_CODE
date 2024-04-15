@@ -1,6 +1,9 @@
 # @author Ryan Gloekler, UC Davis. Hunt Vacuum Microectronics Lab
 # regloekler@ucdavis.edu
-# Last updated: 2/16/2024
+# Reads and processes Serial data recieved from Arduino ADC module, sampling at 10KHz for 10ms.
+# Plots the average data across the sensor over this time period.
+# Stores data samples for each shot in 'data_collection_dump.csv' for later analysis
+# Last updated: 2/28/2024
 
 from datetime import *
 from matplotlib import pyplot as plt
@@ -69,8 +72,10 @@ def main():
     while True:
         line = grab_serial(ser).split(', ')
         if len(line) > 2: # get only proper pixel data from serial
+        
+            # create processing array and start counting data points
+            processed = []
             counter += 1
-            processed = [] # create processing array
 
             # convert all values to integers, omit all other characters
             for val in range(len(line)):
