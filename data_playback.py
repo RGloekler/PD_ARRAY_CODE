@@ -25,12 +25,12 @@ def main():
 
     # make sure the provided file exists
     filenm = sys.argv[-1]
-    if filenm not in os.listdir('./'): exit('File not in directory')
+    if filenm not in os.listdir('./shot_data'): exit('File not in directory')
 
     read_data = []
 
     # open the file and write its contents to an array.
-    with open("./" + filenm, "r") as file:
+    with open("./shot_data/" + filenm, "r") as file:
         reader = csv.reader(file, delimiter="\t")
 
         # get each value, and take off their time-stamps
