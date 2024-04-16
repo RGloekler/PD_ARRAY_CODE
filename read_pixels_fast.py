@@ -6,10 +6,10 @@
 # Last updated: 2/28/2024
 
 from datetime import *
+from time import *
 from matplotlib import pyplot as plt
 from matplotlib.pyplot import draw
 import serial, re, sys, csv, os
-import time
 import numpy as np
 
 #------------------------ DEFINE HELPER FUNCTIONS ------------------------------
@@ -51,7 +51,7 @@ def create_csv(filenm):
 # data from serial here...
 def main():
     # search for csv, create one if it is not found
-    filenm = 'data_collection_dump.csv'
+    filenm = 'shot_data/data_collection_dump.csv'
     if filenm not in os.listdir('./'):
         file_writer = create_csv(filenm)
     else:
@@ -69,10 +69,25 @@ def main():
     # until we recieve data from ADC (firmware has been triggered)
     averaged = []
     averaged_np = []
+    new_shot = True
     while True:
         line = grab_serial(ser).split(', ')
         if len(line) > 2: # get only proper pixel data from serial
-        
+
+            # if a shot has occurred, create a new CSV file for it.
+            if new_shot:
+                cur_time = strftime("%Y-%m-%d_%H-%M-%S", gmtime())
+                print(cur_time)
+                new_shot = False # set the new shot flag, so we dont re-create files for each line
+            
+                newfile = 'shot_data/shot_' + cur_time +'.csv'
+                if newfile not in os.listdir('./'):
+                    file_writer = create_csv(newfile)
+                else:
+                    file_writer = csv.writer(open(newfile, 'a', encoding = 'UTF8', newline=''))
+
+
+            
             # create processing array and start counting data points
             processed = []
             counter += 1
@@ -130,6 +145,8 @@ def main():
                 ax.set_xlabel('Pixel Number')
                 plt.show() # plot the last sample recieved
                 averaged = [] # reset the averaging list for the next shot
+                
+                new_shot = True # reset shot flag for next shot data collection
 
 if __name__ == '__main__':
     main()
