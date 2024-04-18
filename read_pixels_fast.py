@@ -40,7 +40,7 @@ def create_csv(filenm):
     # create a csv file to write background noise data to, and a header array
     file = open('./' + filenm, 'a', encoding = 'UTF8', newline='')
     header = ['Pixel 1', 'Pixel 2', 'Pixel 3', 'Pixel 4', 'Pixel 5', 'Pixel 6', 'Pixel 7',
-    'Pixel 8', 'Pixel 9', 'Pixel 10', 'Pixel 11', 'Pixel 12', 'Pixel 13', 'Pixel 14', 'Pixel 15', 'Sample No.', 'Serial Time']
+    'Pixel 8', 'Pixel 9', 'Pixel 10', 'Pixel 11', 'Pixel 12', 'Pixel 13', 'Pixel 14', 'Pixel 15', 'Pixel 16', 'Sample No.', 'Serial Time']
 
     writer = csv.writer(file)
     writer.writerow(header)
@@ -115,7 +115,7 @@ def main():
 
             # write the current set of pixel data to csv, and close file
             file_writer.writerow(scaled)
-
+            
             # if recieved a complete set of data, plot it
             if counter % 100 == 0:
                 # if we are ready to finish handling this shot, average data

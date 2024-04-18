@@ -35,7 +35,7 @@ def main():
 
         # get each value, and take off their time-stamps
         for i, line in enumerate(reader):
-            read_data.append(line[0].split(',')[:-1])
+            read_data.append(line[0].split(',')[:-2])
         read_data.pop(0)
 
     # convert to floating point data from strings...
