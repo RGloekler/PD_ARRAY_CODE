@@ -7,11 +7,11 @@
 // regloekler@ucdavis.edu
 // Takes an input trigger from DG535, which causes an interrupt. 100 data samples are taken at 10KHz
 // (10 ms total sampling time). Data is then sent to serial, where it can be retrieved by python for processing.
-// Last edit: 2/15/2024
+// Last edit: 2/29/2024
 
 // storing 100 values @ 10KHz = 10ms of data. Solenoid should be active ~5ms.
-const unsigned int readings = 100;
-const unsigned int numPixels   = 15;
+const unsigned int readings  = 100;
+const unsigned int numPixels = 16;
 unsigned int analogVals[readings][numPixels]; // create an array to store data readings in 
 unsigned int i = 0;
 
@@ -59,7 +59,7 @@ void loop()
       int counter = 0;
       Serial.println("Captured Data, exiting");
       for (int x = 0; x < 100; x++) {
-        for (int y = 0; y < 15; y++) {
+        for (int y = 0; y <= 15; y++) {
           Serial.print(analogVals[x][y]);
           Serial.print(", ");
         }
