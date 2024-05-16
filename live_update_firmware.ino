@@ -7,6 +7,7 @@
 void setup() {
   // initialize serial communication at 9600 bits per second:
   Serial.begin(9600);
+  analogReference(EXTERNAL); // use an external analog reference for ADC. Allows for manual tuning of adc sensitivity. 0 --> 1023 == 0 --> x Volts, x is the external reference voltage
 }
 
 void loop() {
